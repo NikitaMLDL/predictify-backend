@@ -21,7 +21,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.CR_PAT }}
 
       - name: Build and Push Docker image
         uses: docker/build-push-action@v6
@@ -29,4 +29,5 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/nikitamldl/model-inference:latest
-
+          cache-from: type=registry,ref=ghcr.io/nikitamldl/model-inference:cache
+          cache-to: type=registry,ref=ghcr.io/nikitamldl/model-inference:cache,mode=max
