@@ -3,7 +3,9 @@ FROM python:3.11-slim
 # Install python packages
 WORKDIR /app
 
-COPY . .
+COPY requirements.txt .
+COPY inference.py .
+COPY templates/ ./templates
 
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
