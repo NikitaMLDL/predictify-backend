@@ -4,14 +4,16 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 import mlflow.pyfunc
 import pandas as pd
+import os
 
+os.environ["MLFLOW_S3_ENDPOINT_URL"] = "http://<YOUR_IP>:9000"
 
 templates = Jinja2Templates(directory="templates")
 
 
 class Model:
     def __init__(self, experiment_name: str, stage: str = "Staging"):
-
+        mlflow.set_tracking_uri("http://<YOUR_IP>:5000")
         self.model = mlflow.pyfunc.load_model(f"models:/{experiment_name}/{stage}")
 
     def predict(self, df: pd.DataFrame):
