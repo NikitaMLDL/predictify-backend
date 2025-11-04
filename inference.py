@@ -10,7 +10,7 @@ templates = Jinja2Templates(directory="templates")
 
 
 class Model:
-    def __init__(self, experiment_name: str, stage: str = "Staging", tracking_uri: str = None):
+    def __init__(self, experiment_name: str, stage: str = "Staging"):
 
         self.model = mlflow.pyfunc.load_model(f"models:/{experiment_name}/{stage}")
 
