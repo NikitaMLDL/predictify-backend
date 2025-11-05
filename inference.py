@@ -6,6 +6,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 import mlflow.pyfunc
 import pandas as pd
+import time
 
 
 app = FastAPI(title="Iris Classifier Inference")
@@ -16,11 +17,6 @@ PREDICTION_LATENCY = Gauge(
     "model_prediction_latency_seconds",
     "Time spent performing model inference (seconds)"
 )
-
-
-@instrumentator.add
-def add_custom_metrics(instrumentator: Instrumentator):
-    return instrumentator
 
 
 instrumentator.instrument(app).expose(app, endpoint="/metrics")
@@ -68,7 +64,11 @@ def predict_form(
         df['sepal_ratio'] = df['SepalLengthCm'] / df['SepalWidthCm']
         df['petal_ratio'] = df['PetalLengthCm'] / df['PetalWidthCm']
 
+        start_time = time.time()
         prediction = iris_model.predict(df)[0]
+        elapsed = time.time() - start_time
+
+        PREDICTION_LATENCY.set(elapsed)
         return templates.TemplateResponse("index.html", {"request": request, "prediction": prediction})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
