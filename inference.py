@@ -30,8 +30,8 @@ def add_custom_metrics(instrumentator: Instrumentator):
     return instrumentator
 
 
-instrumentator.instrument(app).expose(app, endpoint="/metrics")
-
+# instrumentator.instrument(app).expose(app, endpoint="/metrics")
+instrumentator.instrument(app).expose(app)
 templates = Jinja2Templates(directory="templates")
 
 
