@@ -10,14 +10,7 @@ import pandas as pd
 
 app = FastAPI(title="Iris Classifier Inference")
 
-instrumentator = Instrumentator(
-    should_group_status_codes=True,
-    should_ignore_untemplated=True,
-    should_respect_env_var=True,
-    excluded_handlers=["/metrics"],
-    env_var_name="ENABLE_METRICS",
-    should_instrument_requests_inprogress=True,
-)
+instrumentator = Instrumentator()
 
 PREDICTION_LATENCY = Gauge(
     "model_prediction_latency_seconds",
@@ -41,8 +34,6 @@ class Model:
 
     def predict(self, df: pd.DataFrame):
         return self.model.predict(df)
-
-
 
 
 iris_model = Model(experiment_name="IrisClassifier", stage="Staging")
