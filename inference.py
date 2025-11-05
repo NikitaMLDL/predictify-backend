@@ -1,10 +1,36 @@
 from fastapi import FastAPI, HTTPException, Request, Form
+from prometheus_fastapi_instrumentator import Instrumentator
+from prometheus_client import Gauge
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 import mlflow.pyfunc
 import pandas as pd
 
+
+app = FastAPI(title="Iris Classifier Inference")
+
+instrumentator = Instrumentator(
+    should_group_status_codes=True,
+    should_ignore_untemplated=True,
+    should_respect_env_var=True,
+    excluded_handlers=["/metrics"],
+    env_var_name="ENABLE_METRICS",
+    should_instrument_requests_inprogress=True,
+)
+
+# ====== Кастомные метрики ======
+PREDICTION_LATENCY = Gauge(
+    "model_prediction_latency_seconds",
+    "Time spent performing model inference (seconds)"
+)
+
+@instrumentator.add()
+def add_custom_metrics(instrumentator: Instrumentator):
+    return instrumentator
+
+
+instrumentator.instrument(app).expose(app, endpoint="/metrics")
 
 templates = Jinja2Templates(directory="templates")
 
@@ -18,7 +44,7 @@ class Model:
         return self.model.predict(df)
 
 
-app = FastAPI(title="Iris Classifier Inference")
+
 
 iris_model = Model(experiment_name="IrisClassifier", stage="Staging")
 
