@@ -19,13 +19,13 @@ instrumentator = Instrumentator(
     should_instrument_requests_inprogress=True,
 )
 
-# ====== Кастомные метрики ======
 PREDICTION_LATENCY = Gauge(
     "model_prediction_latency_seconds",
     "Time spent performing model inference (seconds)"
 )
 
-@instrumentator.add()
+
+@instrumentator.add
 def add_custom_metrics(instrumentator: Instrumentator):
     return instrumentator
 
