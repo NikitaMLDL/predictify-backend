@@ -72,3 +72,10 @@ def predict_form(
         return templates.TemplateResponse("index.html", {"request": request, "prediction": prediction})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/webhook")
+async def receive_webhook(req: Request):
+    data = await req.json()
+    print("Webhook received:", data)
+    return {"status": "success"}
