@@ -80,12 +80,12 @@ def predict_form(
 @app.post("/webhook/")
 async def receive_webhook(req: Request):
     payload = await req.json()
-    print(id(iris_model))
+    print("Before load:", id(iris_model.model))
     if payload.get("entity") == "model_version_alias" and payload.get("action") == "created":
         data = payload.get("data", {})
         if data.get("alias") == "prod":
             iris_model.load(data.get("name"), "prod")
-            print(id(iris_model))
+            print("After load:", id(iris_model.model))
             print(f"Model '{data.get('name')}' loaded with alias 'prod'")
     return {"status": "success"}
 
