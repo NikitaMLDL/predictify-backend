@@ -24,15 +24,15 @@ templates = Jinja2Templates(directory="templates")
 
 
 class Model:
-    def __init__(self, experiment_name: str, stage: str = "Staging"):
+    def __init__(self, experiment_name: str, alias: str = "staging"):
 
-        self.model = mlflow.pyfunc.load_model(f"models:/{experiment_name}/{stage}")
+        self.model = mlflow.pyfunc.load_model(model_uri=f"models:/{experiment_name}@{alias}")
 
     def predict(self, df: pd.DataFrame):
         return self.model.predict(df)
 
 
-iris_model = Model(experiment_name="IrisClassifier", stage="Staging")
+iris_model = Model(experiment_name="IrisClassifier", alias="staging")
 
 
 @app.get("/", response_class=HTMLResponse)
