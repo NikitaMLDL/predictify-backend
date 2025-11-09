@@ -24,15 +24,18 @@ templates = Jinja2Templates(directory="templates")
 
 
 class Model:
-    def __init__(self, experiment_name: str, alias: str = "staging"):
+    def __init__(self):
+        self.model = None
 
+    def load(self, experiment_name: str, alias: str):
         self.model = mlflow.pyfunc.load_model(model_uri=f"models:/{experiment_name}@{alias}")
 
     def predict(self, df: pd.DataFrame):
         return self.model.predict(df)
 
 
-iris_model = Model(experiment_name="IrisClassifier", alias="staging")
+iris_model = Model()
+iris_model.load("IrisClassifier", "staging")
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -76,6 +79,16 @@ def predict_form(
 
 @app.post("/webhook/")
 async def receive_webhook(req: Request):
-    data = await req.json()
-    print("Webhook received:", data)
+    payload = await req.json()
+    if payload.get("entity") == "model_version_alias" and payload.get("action") == "created":
+        data = payload.get("data", {})
+        if data.get("alias") == "prod":
+            iris_model.load(data.get("name"), "prod")
+            print(f"Model '{data.get('name')}' loaded with alias 'prod'")
     return {"status": "success"}
+
+# @app.post("/webhook/")
+# async def receive_webhook(req: Request):
+#     data = await req.json()
+#     print("Webhook received:", data)
+#     return {"status": "success"}
