@@ -74,7 +74,7 @@ def predict_form(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/webhook")
+@app.post("/webhook/")
 async def receive_webhook(req: Request):
     data = await req.json()
     print("Webhook received:", data)
